@@ -4,7 +4,7 @@ pipeline {
     environment {
         GCP_PROJECT = 'DevOps-MF'
         GCR_REGION = 'us-central1'
-        IMAGE_NAME = "${GCR_REGION}-docker.pkg.dev/${GCP_PROJECT}/sample-repo/sample-app"
+        IMAGE_NAME = "${GCR_REGION}-docker.pkg.dev/sample-repo/sample-app"
         GCP_CREDENTIALS = credentials('gcp-service-account') // Add this in Jenkins credentials
     }
 
