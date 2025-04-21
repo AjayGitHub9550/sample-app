@@ -1,50 +1,47 @@
 pipeline {
-    agent any
-
-    environment {
-        GCP_PROJECT = 'DevOps-MF'
-        GCR_REGION = 'us-central1'
-        IMAGE_NAME = "${GCR_REGION}-docker.pkg.dev/sample-repo/sample-app"
-        GCP_CREDENTIALS = credentials('gcp-service-account') // Add this in Jenkins credentials
+  agent any
+  stages {
+    stage('Checkout') {
+      steps {
+        sh 'echo passed'
+        //git branch: 'main', url: 'https://github.com/AjayGitHub9550/sample-app.git'
+      }
     }
-
-    stages {
-        stage('Checkout') {
-            steps {
-                git url: 'https://github.com/AjayGitHub9550/sample-app.git', branch: 'main'
+    
+    stage('Build and Push Docker Image') {
+      environment {
+        DOCKER_IMAGE = "ajay9550/sample-app:${BUILD_NUMBER}"
+        // DOCKERFILE_LOCATION = "java-maven-sonar-argocd-helm-k8s/spring-boot-app/Dockerfile"
+        REGISTRY_CREDENTIALS = credentials('docker-cred')
+      }
+      steps {
+        script {
+            sh 'docker build -t ${DOCKER_IMAGE} .'
+            def dockerImage = docker.image("${DOCKER_IMAGE}")
+            docker.withRegistry('https://index.docker.io/v1/', "docker-cred") {
+                dockerImage.push()
             }
         }
-
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    docker.build("${IMAGE_NAME}:${BUILD_NUMBER}")
-                }
-            }
+      }
+    }
+    stage('Update Deployment File') {
+        environment {
+            GIT_REPO_NAME = "sample-app"
+            GIT_USER_NAME = "AjayGitHub9550"
         }
-
-        stage('Push to GCR') {
-            steps {
-                script {
-                    withDockerRegistry(credentialsId: 'gcp-service-account', url: "https://${GCR_REGION}-docker.pkg.dev") {
-                        docker.image("${IMAGE_NAME}:${BUILD_NUMBER}").push()
-                    }
-                }
-            }
-        }
-
-        stage('Deploy to GKE') {
-            steps {
-                withCredentials([file(credentialsId: 'gcp-key-json', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
-                    sh '''
-                        gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
-                        gcloud config set project $GCP_PROJECT
-                        gcloud container clusters get-credentials devops-task-cluster --region $GCR_REGION
-
-                        kubectl set image deployment/sample-app-deployment sample-app=${IMAGE_NAME}:${BUILD_NUMBER} --record
-                    '''
-                }
+        steps {
+            withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
+                sh '''
+                    git config user.email "ajay.yerukula@outlook.com"
+                    git config user.name "Ajay Yerukula"
+                    BUILD_NUMBER=${BUILD_NUMBER}
+                    sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" k8s/deployment.yml
+                    git add k8s/deployment.yml
+                    git commit -m "Update deployment image to version ${BUILD_NUMBER}"
+                    git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
+                '''
             }
         }
     }
+  }
 }
