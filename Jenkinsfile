@@ -4,7 +4,7 @@ pipeline {
     stage('Checkout') {
       steps {
         sh 'echo passed'
-        //git branch: 'main', url: 'https://github.com/AjayGitHub9550/sample-app.git'
+        //git branch: 'main', url: 'https://github.com/AjayGitHub9550/sample-app.git#'
       }
     }
     
