@@ -5,8 +5,8 @@ metadata:
 spec:
   type: LoadBalancer             # This provisions an AWS NLB (or ALB via controller)
   ports:
-    - name: https
-      port: 443                  # Clients access on this port (externally)
+    - name: http
+      port: 8081                  # Clients access on this port (externally)
       targetPort: 3000           # This must match the port your app listens to inside the pod
       protocol: TCP
   selector:
