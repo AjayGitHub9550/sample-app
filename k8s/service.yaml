@@ -3,12 +3,13 @@ kind: Service
 metadata:
   name: sample-app-service
 spec:
-  type: LoadBalancer
+  type: NodePort
   ports:
   - name: http
     port: 8081
     targetPort: 5000  
     protocol: TCP
+    nodePort: 30081  # Optional: pick a port in the range 30000–32767
   selector:
     app: sample-app
 
