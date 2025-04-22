@@ -3,14 +3,15 @@ kind: Service
 metadata:
   name: sample-app-service
 spec:
-  type: LoadBalancer   # Change this from NodePort to LoadBalancer
+  type: LoadBalancer
   ports:
-  - name: http
-    port: 8081          # The port exposed by the load balancer
-    targetPort: 3000    # The port on your container
-    protocol: TCP
+    - name: https
+      port: 443           # Externally exposed port (HTTPS)
+      targetPort: 3000    # Your app listens on this inside the pod
+      protocol: TCP
   selector:
-    app: sample-app
+    app: sample-app       # Make sure this matches your Deployment label
+
 
 
 
