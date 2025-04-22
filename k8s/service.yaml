@@ -5,12 +5,17 @@ metadata:
 spec:
   type: LoadBalancer
   ports:
+    - name: http
+      port: 8081         # Internal port
+      targetPort: 3000   # The port on your container
+      protocol: TCP
     - name: https
-      port: 443           # Externally exposed port (HTTPS)
-      targetPort: 3000    # Your app listens on this inside the pod
+      port: 443          # Exposed as HTTPS on the LoadBalancer
+      targetPort: 3000   # Port to route to inside the container
       protocol: TCP
   selector:
-    app: sample-app       # Make sure this matches your Deployment label
+    app: sample-app
+   # Make sure this matches your Deployment label
 
 
 
