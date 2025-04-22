@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: sample-app
-        image: ajay9550/sample-app:16
+        image: ajay9550/sample-app:replaceImageTag
         ports:
         - containerPort: 5000
