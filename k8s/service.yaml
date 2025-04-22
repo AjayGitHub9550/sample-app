@@ -3,18 +3,15 @@ kind: Service
 metadata:
   name: sample-app-service
 spec:
-  type: LoadBalancer
+  type: LoadBalancer             # This provisions an AWS NLB (or ALB via controller)
   ports:
-    - name: http
-      port: 8081         # Internal port
-      targetPort: 3000   # The port on your container
-      protocol: TCP
     - name: https
-      port: 443          # Exposed as HTTPS on the LoadBalancer
-      targetPort: 3000   # Port to route to inside the container
+      port: 443                  # Clients access on this port (externally)
+      targetPort: 3000           # This must match the port your app listens to inside the pod
       protocol: TCP
   selector:
-    app: sample-app
+    app: sample-app              # Matches pods with label "app: sample-app"
+
    # Make sure this matches your Deployment label
 
 
