@@ -16,4 +16,4 @@ spec:
       - name: sample-app
         image: ajay9550/sample-app:10
         ports:
-        - containerPort: 5000
+        - containerPort: 3000
